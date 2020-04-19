@@ -94,7 +94,7 @@ class SeleniumHelper():
         return sequence
 
     def create_user(self, email='', name='', password='', c_password='', phone='', comment=''):
-        # mylogger = logging.getLogger('baseCreateUser')
+        logger = logging.getLogger('base_test.create_us_form')
 
         fields = {
             "email": (self.browser.find_element(*CreteUserPage.EMAIL_FIELD), email),
@@ -108,36 +108,48 @@ class SeleniumHelper():
             if val[1]:
                 val[0].clear()
                 val[0].send_keys(val[1])
+
+                logger.info(f"Полю '{field}' приствоенно значение '{val[1]}'")
             else:
                 continue
         submit_but = self.browser.find_element(*CreteUserPage.SUBMIT)
         submit_but.click()
-
-        # self.browser.get(Links.CREATE_USER_LINK)
+        logger.info("Отправка формы")
 
     def check_user_in_bd(self, email):
+        logger = logging.getLogger('base_test.check_user_in_bd')
         if email:
             if pgdb.check_user_exist(email):
+                logger.info(f"Пользоваетль '{email}' успешно создан")
+                print(f"Пользоваетль '{email}' успешно создан")
                 pgdb.del_new_user(email)
-                print(f'Пользователь: "{email}" успешно создан')
-                # assert False, f'Пользователь: "{email}" успешно создан. Сообщение на сайте: "{alr}"'
+                logger.info(f"Удаление данных пользователя '{email}' из БД")
+                print(f"Удаление данных пользователя '{email}' из БД")
             else:
+                logger.info(f'Пользователь: "{email}" не был создан')
                 print(f'Пользователь: "{email}" не был создан')
-                # assert False, f'Пользователь: "{email}" не был создан по причине: "{alr}"'
         else:
-            print("Поле email не было заполнено")
+            logger.info("Поле email не было заполнено")
 
     def get_text_alret(self):
+        logger = logging.getLogger('base_test.response_from_site')
         if self.is_element_present(*CreteUserPage.ALERT_MESS):
             alerts = self.browser.find_elements(*CreteUserPage.ALERT_MESS)
             # [print(f"Сообщение на странице формы cоздания пользователя:\n '{i.text}'") for i in alerts]
-            print(f'Сообщение на сайте: {", ".join([i.text for i in alerts])}')
+            logger.debug(f'Сообщение на сайте: "{", ".join([i.text for i in alerts])}"')
+            print(f'Сообщение на сайте: "{", ".join([i.text for i in alerts])}"')
 
     def get_text_mess(self):
-        if self.is_element_present(*CreteUserPage.ERR_MESS, timeout=1):
-            err_mes = self.browser.find_element(*CreteUserPage.ERR_MESS)
-            return err_mes.text
+        # if self.is_element_present(*CreteUserPage.ERR_MESS_PASS, timeout=1):
+        try:
+            err_mes = self.browser.find_element(*CreteUserPage.ERR_MESS_PASS)
+            print(f"Сообщение под полем{err_mes.text}")
+        except:
+            pass
 
-    def asasa(self):
-        return [i*10 for i in range(10)]
+    def check_phone(self, email='testtest@mail.ru'):
+        try:
+            return pgdb.get_cell(search_row='phone', val=('%s' % email))
+        except:
+            return False
 

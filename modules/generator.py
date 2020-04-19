@@ -30,7 +30,11 @@ def zzuf(text, chr_seq, pr=int(random.randint(1, 100))):
     return fuzz_text
 
 
-# a = 9
-# a = (4,9)
-
-[print(gen_rand_sting("fsdfsdfsd", (4, 9))) for i in range(30)]
+def str_in_email(text):
+    assert len(text) >= 5, f'В тесте должно быть минимум 5 символов, два из них будут заменены на "@" и "."'
+    list_text = list(text)
+    one_index = random.randint(1, len(text[1:-3]))
+    two_index = random.randint(one_index + 2, len(text[:-2]))
+    for i, j in zip(["@", "."], [one_index, two_index]):
+        list_text[j] = i
+    return "".join(list_text)

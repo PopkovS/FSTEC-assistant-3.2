@@ -1,5 +1,6 @@
 import psycopg2
 
+
 # from pages.locators import LoginLocators, Links, TestData
 
 
@@ -24,11 +25,11 @@ def check_user_exist(user):
     conn, cursor = db_connect()
     cursor.execute('SELECT email '
                    'FROM public.astusers'
-                   f' WHERE email=$$\'{user}\'$$')
+                   f' WHERE email=$${user}$$')
     astusers = bool(cursor.fetchall())
     cursor.execute(f'SELECT "Email" '
                    f'FROM public."AspNetUsers" '
-                   f'WHERE "Email" = $$\'{user}\'$$')
+                   f"WHERE \"Email\" = $${user}$$")
     aspNetUsers = bool(cursor.fetchall())
     assert astusers == aspNetUsers, f"Ответ от таблиц отличается. " \
                                     f"astusers = '{astusers}', AspNetUsers = '{aspNetUsers}'"
@@ -61,7 +62,7 @@ def get_id_user(user):
     assert check_user_exist(user), f"Невозможно получить id, Пользователя {user} нет в базе"
     cursor.execute('SELECT id '
                    'FROM public.astusers'
-                   f' WHERE email=$$\'{user}\'$$')
+                   f' WHERE email=$${user}$$')
     result = cursor.fetchall()
     if result:
         return result[0][0]
@@ -87,7 +88,7 @@ def get_cell(search_row="id", table="astusers", where_col="email", val=''):
 
 def delete_row(table="astclientdevices", column="title", val="'Наименование'"):
     conn, cursor = db_connect()
-    cursor.execute(f"DELETE FROM public.{table} WHERE {column} =$${val}$$")
+    cursor.execute(f"DELETE FROM public.{table} WHERE {column} ={val}")
     conn.commit()
     db_disconnect()
 
@@ -112,7 +113,7 @@ def change_auth_ad(val="True"):
         change_cells(table="systemparameters", column="value", new_val="", where_col="type", where_val=136)
 
 
-def change_twofactor(val="true", user = ""):
+def change_twofactor(val="true", user=""):
     assert check_user_exist(), f"Невозможно изменить данные, Пользователя {user} нет в базе"
     change_cells(table="astusers", column="twofactorsignneeded", new_val=val)
     change_cells(table='"AspNetUsers"', column='"TwoFactorEnabled"', new_val=val, where_col='"Email"',
@@ -128,15 +129,7 @@ def del_new_user(user):
     delete_row(table='astusers', column='email', val=(f"'{user}'"))
 
 
-
-
 # change_direct_control(val="False")
-# del_new_user("testassistNewUser2@mailforspam.com")
-# del_new_user("ADMIN1@TEST.LOCAL")
-# del_new_user(user=TestData.NEW_USER.replace("ser","ser2").lower())
-
-# print(get_cell(search_row="objectguid", table="astusers", where_col="email", val="testassistnewuser2@mailforspam.com"))
-# print(get_cell(search_row="distinguishedname", table="astusers", where_col="email", val="testassistnewuser2@mailforspam.com"))
-# print(check_user_binding_with_ad(TestData.NEW_USER_EMAIL2.lower()))
-# unbinding_user_from_ad(TestData.NEW_USER_EMAIL2.lower())
-print(check_user_exist("use'r"))
+# del_new_user("testtestNone@mail.ru")
+# delete_row(table='"AspNetUsers"', column='"Email"', val="'test_email@mail.ru'")
+# print(get_cell(search_row='phone', val='testtestC@mail.ru'))

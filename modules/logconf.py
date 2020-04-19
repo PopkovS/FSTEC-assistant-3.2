@@ -2,13 +2,14 @@ import logging
 import datetime
 
 now = datetime.datetime.now()
+date_str = now.strftime("%Y-%d-%m_%H%M%S")
 
 
-def logs(file, log_obj):
-    now_el = datetime.datetime.now()
-    date_str = now_el.strftime("%d-%m-%Y %H:%M")
-    logging.basicConfig(level=logging.INFO,
-                        filename=f"../logs/{file}-{date_str}.log",
-                        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    return logging.getLogger(log_obj)
-    # pass
+def log_for_tests(f_name="file_name", getLog="base_test"):
+    logger = logging.getLogger(getLog)
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(f"../logs/{f_name}-{date_str}.log", encoding='utf-8')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    return logger
