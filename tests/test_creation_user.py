@@ -15,7 +15,6 @@ data = TestData()
 @pytest.fixture(scope="module")
 def browser(browser):
     global page
-    # data = TestData()
     page = SeleniumHelper(browser, Links.LOGIN_LINK)
     page.change_sys_paran(dir_control="True")
     page.open()
@@ -24,13 +23,13 @@ def browser(browser):
     yield page
 
 
-@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_mutation(2))
+@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_mutation(4))
 def test_create_user_mutation(browser, email, name, password, phone, comment):
-    log = log_for_tests(f_name="mutation_test_creat_user")
+    log = log_for_tests(f_name="mutation_create_user")
     print("-------------------------------------------------------------------")
     fields_tuple = email, name, password, password, phone, comment
     log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
-    log.info(f"Запуск теста cо слудующими занчениями полей: {fields_tuple}")
+    log.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
     page.create_user(*fields_tuple)
     page.get_text_alret()
     page.open_page(Links.CREATE_USER_LINK)
@@ -38,15 +37,63 @@ def test_create_user_mutation(browser, email, name, password, phone, comment):
     log.handlers.clear()
 
 
-@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(2))
+@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(4))
 def test_create_user_generation(browser, email, name, password, phone, comment):
-    log = log_for_tests(f_name="gen_test_creat_user")
+    log = log_for_tests(f_name="format_gen_create_user")
     print("-------------------------------------------------------------------")
     fields_tuple = email, name, password, password, phone, comment
     log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
-    log.info(f"Запуск теста c параметрами: {fields_tuple}")
+    log.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
     page.create_user(*fields_tuple)
     page.get_text_alret()
     page.open_page(Links.CREATE_USER_LINK)
     page.check_user_in_bd(email)
     log.handlers.clear()
+
+
+class TestCreateUserNotFormat():
+    log = log_for_tests(f_name="not_format_gen_create_user")
+    @pytest.mark.parametrize('email', [" ", "testtestmail.ru", "testtest@mailru",
+                                       "testtestmailru", "testtestee" * 25 + "@mail.ru"])
+    def test_email_field_not_format(self, browser, email):
+        print("\n-------------------------------------------------------------------")
+        self.log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+        self.log.info(f"Запуск теста c email: '{email}'")
+        page.create_user(email=email, name="test_user", password="123", c_password="123")
+        page.get_text_alret()
+        page.get_text_mess_email(CreteUserPage.ERR_MESS_EMAIL, "email")
+        page.open_page(Links.CREATE_USER_LINK)
+        page.check_user_in_bd(email)
+
+    @pytest.mark.parametrize('name', [" ", "testtestee" * 26])
+    def test_name_field_not_format(self, browser, name):
+        print("\n-------------------------------------------------------------------")
+        self.log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+        self.log.info(f"Запуск теста c name: '{name}'")
+        email = "testtest@mail.ru"
+        page.create_user(email=email, name=name, password="123", c_password="123")
+        page.get_text_alret()
+        page.get_text_mess_email(CreteUserPage.ERR_MESS_NAME, "name")
+        page.open_page(Links.CREATE_USER_LINK)
+        page.clean_aspnetusers(email)
+        page.check_user_in_bd(email)
+
+    @pytest.mark.parametrize('passw, c_passw', [(" ", "1qaz@WSX"), ("1qaz@WSX", " "), ("1qaz@WSX", "1qaz@WSX2"),
+                                                ("1qa@W", "1qa@W"), ("1qazWSX", "1qazWSX"), ("qaz@WSX", "qaz@WSX"),
+                                                ("1QAZ@WSX", "1QAZ@WSX"), ("1qaz@wsx", "1qaz@wsx"),
+                                                ("1qaz@WSX" * 17, "1qaz@WSX" * 17)])
+    def test_password_field_not_format(self, browser, passw, c_passw ):
+        print("\n-------------------------------------------------------------------")
+        page.change_password_setting(6, "True", "True", "True", "True")
+        self.log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+        self.log.info(f"Запуск теста c password: '{passw}' ")
+        self.log.info(f"Запуск теста c conf_password: '{c_passw}'")
+        email = "testtest@mail.ru"
+        page.create_user(email=email, name="test_user", password=passw, c_password=c_passw)
+        page.get_text_alret()
+        page.get_text_mess_email(CreteUserPage.ERR_MESS_PASS, "password")
+        page.open_page(Links.CREATE_USER_LINK)
+        page.change_password_setting()
+        page.check_user_in_bd(email)
+
+

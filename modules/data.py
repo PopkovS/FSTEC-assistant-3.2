@@ -4,7 +4,7 @@ import string
 from selenium.webdriver.common.by import By
 
 # from faker import Faker
-from modules.generator import gen_rand_sting, create_sequence, str_in_email, zzuf
+from modules.generator import gen_rand_sting, create_sequence, str_in_email, str_in_mac, zzuf
 
 
 class Locators():
@@ -41,6 +41,7 @@ class CreteUserPage():
     SUBMIT = (By.CSS_SELECTOR, '.btn.btn-primary[type="submit"]')
     ALERT_MESS = (By.ID, 'toast-container')
     ERR_MESS_EMAIL = (By.CSS_SELECTOR, '[for="Email"]')
+    ERR_MESS_NAME = (By.CSS_SELECTOR, '[data-valmsg-for="UserName"]')
     ERR_MESS_PASS = (By.CSS_SELECTOR, '.field-validation-valid.s-error-message')
 
 
@@ -52,8 +53,9 @@ class Links():
 
 class TestData():
     TEST_SYM_STRING = create_sequence((32, 127), (1025, 1026), (1040, 1104), (1105, 1106))
-    TEST_SYM_EMAIL_CORR = create_sequence((65, 91), (97, 123)) + ['-', '.', '_']
-    TEST_SYM_MUT = create_sequence((32,500))
+    TEST_SYM_EMAIL_CORR = create_sequence((65, 91), (97, 123), (48, 58)) + ['-', '.', '_']
+    TEST_SYM_MUT = create_sequence((32, 500))
+    TEST_SYM_MAC = create_sequence((48, 58), (97, 102))
 
     def data_gen_create_user_format(self, count):
         sym_list = self.TEST_SYM_STRING
@@ -70,15 +72,36 @@ class TestData():
         sym_list = self.TEST_SYM_STRING
         sym_mut = self.TEST_SYM_MUT
         test_data = [
-            (str_in_email(zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, (5, 256)), sym_mut, random.randint(1,100))),
-             zzuf(gen_rand_sting(sym_list, (1, 256)), sym_mut, random.randint(1,100)),
-             zzuf(gen_rand_sting(sym_list, (1, 128)), sym_mut, random.randint(1,100)),
-             zzuf(gen_rand_sting(string.digits, 10), sym_mut, random.randint(1,100)),
-             zzuf(gen_rand_sting(sym_list + [" "] * 10, (0, 60)), sym_mut, random.randint(1,100)))
+            (str_in_email(zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, (5, 256)), sym_mut, random.randint(1, 100))),
+             zzuf(gen_rand_sting(sym_list, (1, 256)), sym_mut, random.randint(1, 100)),
+             zzuf(gen_rand_sting(sym_list, (1, 128)), sym_mut, random.randint(1, 100)),
+             zzuf(gen_rand_sting(string.digits, 10), sym_mut, random.randint(1, 100)),
+             zzuf(gen_rand_sting(sym_list + [" "] * 10, (0, 60)), sym_mut, random.randint(1, 100)))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_ident_format(self, count):
+        test_data = [
+            (str_in_mac(gen_rand_sting(string.hexdigits, 12)),
+             gen_rand_sting(string.digits, 11),
+             gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8),#8
+             gen_rand_sting(string.digits + string.ascii_letters, 10),#10
+             gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77))#77
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_ident_mutation(self, count):
+        sym_mut = self.TEST_SYM_MUT
+        test_data = [
+            (str_in_mac(zzuf(gen_rand_sting(string.hexdigits, 12), sym_mut, random.randint(1, 100))),
+             zzuf(gen_rand_sting(string.digits, 11), sym_mut, random.randint(1, 100)),
+             zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),#8
+             zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)),#10
+             zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
             for _ in range(count)]
         return test_data
 
 
 c = TestData()
-# print(c.TEST_SYM_STRING)
-[print(c.data_gen_create_user_mutation(1)) for _ in range(1)]
+print(c.TEST_SYM_EMAIL_CORR)
+[print(i) for i in c.data_gen_ident_mutation(3)]

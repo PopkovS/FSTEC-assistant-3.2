@@ -12,7 +12,7 @@ main_link = "http://lk.corp.ast.safib.ru/"
 
 
 class SeleniumHelper():
-    def __init__(self, browser, url, timeout=3):
+    def __init__(self, browser, url, timeout=1):
         self.browser = browser
         self.url = url
         self.browser.implicitly_wait(timeout)
@@ -135,17 +135,15 @@ class SeleniumHelper():
         logger = logging.getLogger('base_test.response_from_site')
         if self.is_element_present(*CreteUserPage.ALERT_MESS):
             alerts = self.browser.find_elements(*CreteUserPage.ALERT_MESS)
-            # [print(f"Сообщение на странице формы cоздания пользователя:\n '{i.text}'") for i in alerts]
             logger.debug(f'Сообщение на сайте: "{", ".join([i.text for i in alerts])}"')
             print(f'Сообщение на сайте: "{", ".join([i.text for i in alerts])}"')
 
-    def get_text_mess(self):
-        # if self.is_element_present(*CreteUserPage.ERR_MESS_PASS, timeout=1):
-        try:
-            err_mes = self.browser.find_element(*CreteUserPage.ERR_MESS_PASS)
-            print(f"Сообщение под полем{err_mes.text}")
-        except:
-            pass
+    def get_text_mess_email(self, field, f_name):
+        logger = logging.getLogger('base_test.message_field')
+        if self.is_element_present(*field, timeout=1):
+            err_mes = self.browser.find_element(*field)
+            logger.debug(f' Сообщение на под полем email: "{err_mes.text}"')
+            print(f"Сообщение под полем {f_name}: '{err_mes.text}'")
 
     def check_phone(self, email='testtest@mail.ru'):
         try:
@@ -153,3 +151,8 @@ class SeleniumHelper():
         except:
             return False
 
+    def clean_aspnetusers(self, email="testtest@mail.ru"):
+        pgdb.delete_row(table='"AspNetUsers"', column='"Email"', val=("'%s'" % email))
+
+    def change_password_setting(self, pas_len=1, one_sym="False", one_dig="False", one_lower="False", one_upper="False"):
+        pgdb.change_password_param(pas_len, one_sym, one_dig, one_lower, one_upper)

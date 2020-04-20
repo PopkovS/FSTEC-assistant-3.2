@@ -128,8 +128,16 @@ def del_new_user(user):
     delete_row(table='"AspNetUsers"', column='"Email"', val=(f"'{user}'"))
     delete_row(table='astusers', column='email', val=(f"'{user}'"))
 
+def change_password_param(pas_len=1, one_sym="False", one_dig="False", one_lower="False", one_upper="False"):
+    change_cells(table="systemparameters", column="value", new_val=pas_len, where_col="type", where_val=120)
+    change_cells(table="systemparameters", column="value", new_val=one_sym, where_col="type", where_val=121)
+    change_cells(table="systemparameters", column="value", new_val=one_dig, where_col="type", where_val=122)
+    change_cells(table="systemparameters", column="value", new_val=one_lower, where_col="type", where_val=123)
+    change_cells(table="systemparameters", column="value", new_val=one_upper, where_col="type", where_val=124)
 
 # change_direct_control(val="False")
-# del_new_user("testtestNone@mail.ru")
-# delete_row(table='"AspNetUsers"', column='"Email"', val="'test_email@mail.ru'")
+# del_new_user("r@xn--vgbqpj-6pb.raumykd.kzyshdz")
+# del_new_user("JG@xn--vga.b")
+# delete_row(table='"AspNetUsers"', column='"Email"', val="'testtest@mail.ru'")
 # print(get_cell(search_row='phone', val='testtestC@mail.ru'))
+# change_password_param()

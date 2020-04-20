@@ -1,4 +1,8 @@
 import logging
+import os
+import re
+import string
+import sys
 
 
 def word_count(myfile):
@@ -13,3 +17,7 @@ def word_count(myfile):
             return num_words
     except OSError as e:
         logging.error("error reading the file")
+
+# st = "ss_klklklklklklklk_dd"
+# print(re.sub(r'(?<=\s\s)(.*)(_dd)', r'zzzzzzzzzz', st))
+# print(string.digits + string.ascii_lowercase)

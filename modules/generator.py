@@ -1,4 +1,5 @@
 import random
+import string
 
 
 def create_sequence(*args):
@@ -38,3 +39,23 @@ def str_in_email(text):
     for i, j in zip(["@", "."], [one_index, two_index]):
         list_text[j] = i
     return "".join(list_text)
+
+
+def str_in_mac(text):
+    return ":".join([text[i:i + 2] for i in range(0, len(text), 2)])
+
+
+# lst = text.split()
+# print(lst)
+
+
+# print(string.ascii_lowercase)
+# print(string.ascii_letters)
+# print(string.ascii_uppercase)
+# print(string.digits)
+# print(string.octdigits)
+# print(string.whitespace)
+# print(string.punctuation)
+# print(string.printable)
+# print(string.hexdigits)
+

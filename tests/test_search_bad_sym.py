@@ -148,7 +148,7 @@ def test_max_lean(browser):
         page.create_user(email=email_test, password="123", c_password="123", name=text_str)
         print(f"\n[{len(text_str)}] - Длинна name")
         page.get_text_alret()
-        page.get_text_mess()
+        page.get_text_mess_email()
         if pgdb.check_user_exist(email_test):
             sym += "a"
             pgdb.del_new_user(email_test)
