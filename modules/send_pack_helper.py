@@ -54,14 +54,23 @@ def recount_length(my_filename):
         fp.write(new_pack.encode("utf-8"))
 
 
-def create_package_to_send_ident(mac, hs, hv, hn, cp):
+def create_package_to_send_ident(mac, hs, hv, hn):
     with open('../packages/idenTest') as file_in:
         text = file_in.read()
         text = text.replace(re.search(r'M(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w)', text).group(1), mac)
         text = text.replace(re.search(r'HS(\d*)', text).group(1), hs)
         text = text.replace(re.search(r'HV(.*)HN', text).group(1), hv)
         text = text.replace(re.search(r'HN(.*)C', text).group(1), hn)
-        text = text.replace(re.search(r'CP(.*)HN', text).group(1), cp)
+        # text = text.replace(re.search(r'CP(.*)HN', text).group(1), cp)
+        text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
+                            str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
+    with open("../packages/idenTest2", "w", encoding='utf-8') as file_out:
+        file_out.write(text)
+
+def create_package_to_send_hash(hash):
+    with open('../packages/idenTest') as file_in:
+        text = file_in.read()
+        text = text.replace(re.search(r'a.s.s.i.s.t.a.n.t..S.2.5.6...(.+?)..L..', text).group(1), hash)
         text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
                             str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
     with open("../packages/idenTest2", "w", encoding='utf-8') as file_out:
@@ -70,6 +79,6 @@ def create_package_to_send_ident(mac, hs, hv, hn, cp):
 
 with open(fr'../packages/idenTest', 'r') as pack:
     p = pack.read()
-    ln = re.search(r'CP(.*)HN', p).group(1)
-    # l = re.search(r'Content-Length: \d*\n\n(.*)', p).group(1)
+    ln = re.search(r'a.s.s.i.s.t.a.n.t..S.2.5.6...(.+?)..L..', p).group(1)
+    # lnn = "".join((re.findall('\w', ln)))
     print(len(ln))

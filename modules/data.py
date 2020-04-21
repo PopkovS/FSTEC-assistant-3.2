@@ -85,8 +85,8 @@ class TestData():
             (str_in_mac(gen_rand_sting(string.hexdigits, 12)),
              gen_rand_sting(string.digits, 11),
              gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8),#8
-             gen_rand_sting(string.digits + string.ascii_letters, 10),#10
-             gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77))#77
+             gen_rand_sting(string.digits + string.ascii_letters, 10))#10
+             # gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77))#77
             for _ in range(count)]
         return test_data
 
@@ -96,12 +96,23 @@ class TestData():
             (str_in_mac(zzuf(gen_rand_sting(string.hexdigits, 12), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(string.digits, 11), sym_mut, random.randint(1, 100)),
              zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),#8
-             zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)),#10
-             zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
+             zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)))#10
+             # zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
             for _ in range(count)]
+        return test_data
+
+    def data_gen_hash_format(self, count):
+        test_data = [" ".join(gen_rand_sting(string.hexdigits, 64))
+                     for _ in range(count)]
+        return test_data
+
+    def data_gen_hash_mutation(self, count):
+        sym_mut = self.TEST_SYM_MUT
+        test_data = [(" ".join(zzuf(gen_rand_sting(string.hexdigits, 64), sym_mut, random.randint(1, 100))))
+                     for _ in range(count)]
         return test_data
 
 
 c = TestData()
-print(c.TEST_SYM_EMAIL_CORR)
-[print(i) for i in c.data_gen_ident_mutation(3)]
+# print(c.TEST_SYM_EMAIL_CORR)
+[print(i) for i in c.data_gen_hash_format(3)]

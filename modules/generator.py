@@ -1,4 +1,5 @@
 import random
+import re
 import string
 
 
@@ -44,9 +45,10 @@ def str_in_email(text):
 def str_in_mac(text):
     return ":".join([text[i:i + 2] for i in range(0, len(text), 2)])
 
+def str_in_hash(text):
+    return " ".join(text)
 
-# lst = text.split()
-# print(lst)
+print(len(str_in_hash("ab45" * 16)))
 
 
 # print(string.ascii_lowercase)
