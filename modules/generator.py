@@ -8,7 +8,7 @@ def create_sequence(*args):
     for i in args:
         x, y = i
         sequence = sequence + [chr(i) for i in range(x, y)]
-    return sequence
+    return "".join(sequence)
 
 
 def gen_rand_sting(chr_str, len_srt):
@@ -43,14 +43,26 @@ def str_in_email(text):
 
 
 def str_in_mac(text):
-    return ":".join([text[i:i + 2] for i in range(0, len(text), 2)])
+    return "-".join([text[i:i + 2] for i in range(0, len(text), 2)])
+
 
 def str_in_hash(text):
     return " ".join(text)
 
-print(len(str_in_hash("ab45" * 16)))
+
+def str_in_id(text):
+    return " ".join([text[i:i + 3] for i in range(0, len(text), 3)])
 
 
+def create_empty_field_in_list(lst):
+    res = []
+    for i in range(len(lst)):
+        l = lst.copy()
+        l[i] = chr(0)
+        res.append(tuple(l))
+    return res
+
+# print(str_in_id("4561237893424"))
 # print(string.ascii_lowercase)
 # print(string.ascii_letters)
 # print(string.ascii_uppercase)
@@ -60,4 +72,4 @@ print(len(str_in_hash("ab45" * 16)))
 # print(string.punctuation)
 # print(string.printable)
 # print(string.hexdigits)
-
+# print(" ".join("dsffsdafasdfsdfasdfsdfasdfasdf"))

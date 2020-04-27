@@ -4,7 +4,8 @@ import string
 from selenium.webdriver.common.by import By
 
 # from faker import Faker
-from modules.generator import gen_rand_sting, create_sequence, str_in_email, str_in_mac, zzuf
+from modules.generator import gen_rand_sting, create_sequence, str_in_email, str_in_mac, str_in_id, zzuf, \
+    create_empty_field_in_list
 
 
 class Locators():
@@ -52,67 +53,161 @@ class Links():
 
 
 class TestData():
-    TEST_SYM_STRING = create_sequence((32, 127), (1025, 1026), (1040, 1104), (1105, 1106))
-    TEST_SYM_EMAIL_CORR = create_sequence((65, 91), (97, 123), (48, 58)) + ['-', '.', '_']
-    TEST_SYM_MUT = create_sequence((32, 500))
-    TEST_SYM_MAC = create_sequence((48, 58), (97, 102))
+    # SYM_STRING = create_sequence((32, 127), (1025, 1026), (1040, 1104), (1105, 1106))
+    SYM_RUS = create_sequence((1025, 1026), (1040, 1104), (1105, 1106))
+    SYM_ENG = string.ascii_letters + string.digits + string.punctuation + " "
+    SYM_ENG_RUS = string.ascii_letters + string.digits + string.punctuation + " " + SYM_RUS
+    SYM_EMAIL_CORR = create_sequence((65, 91), (97, 123), (48, 58)) + '-._'
+    SYM_FOR_FILES = create_sequence((65, 91), (97, 123), (48, 58)) + '.!#$%&"*+/-=?^_`{|}~'
+    SYM_MUT = create_sequence((32, 500))
+    SYM_HEX = string.digits + string.ascii_lowercase[0:6]
 
     def data_gen_create_user_format(self, count):
-        sym_list = self.TEST_SYM_STRING
+        sym_list = self.SYM_ENG_RUS
         test_data = [
-            (str_in_email(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, (5, 256))),
+            (str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, (5, 256))),
              gen_rand_sting(sym_list, (1, 256)),
              gen_rand_sting(sym_list, (1, 128)),
              gen_rand_sting(string.digits, 10),
-             gen_rand_sting(sym_list + [" "] * 10, (0, 60)))
+             gen_rand_sting(sym_list + " " * 10, (0, 60)))
             for _ in range(count)]
         return test_data
 
     def data_gen_create_user_mutation(self, count):
-        sym_list = self.TEST_SYM_STRING
-        sym_mut = self.TEST_SYM_MUT
+        sym_list = self.SYM_ENG_RUS
+        sym_mut = self.SYM_MUT
         test_data = [
-            (str_in_email(zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, (5, 256)), sym_mut, random.randint(1, 100))),
+            (str_in_email(zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, (5, 256)), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(sym_list, (1, 256)), sym_mut, random.randint(1, 100)),
              zzuf(gen_rand_sting(sym_list, (1, 128)), sym_mut, random.randint(1, 100)),
              zzuf(gen_rand_sting(string.digits, 10), sym_mut, random.randint(1, 100)),
-             zzuf(gen_rand_sting(sym_list + [" "] * 10, (0, 60)), sym_mut, random.randint(1, 100)))
+             zzuf(gen_rand_sting(sym_list + " " * 10, (0, 60)), sym_mut, random.randint(1, 100)))
             for _ in range(count)]
         return test_data
 
     def data_gen_ident_format(self, count):
+        hex = self.SYM_HEX
         test_data = [
-            (str_in_mac(gen_rand_sting(string.hexdigits, 12)),
-             gen_rand_sting(string.digits, 11),
-             gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8),#8
-             gen_rand_sting(string.digits + string.ascii_letters, 10))#10
-             # gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77))#77
+            (str_in_mac(gen_rand_sting(hex, 12)),
+             gen_rand_sting(string.digits, 12),
+             gen_rand_sting(self.SYM_EMAIL_CORR, 11),  # 11
+             gen_rand_sting(string.digits + string.ascii_letters, 8))  # 8
             for _ in range(count)]
         return test_data
 
+    def data_gen_ident_not_format(self):
+        hex = self.SYM_HEX
+        mac = str_in_mac(gen_rand_sting(hex, 12))
+        hs = gen_rand_sting(string.digits, 12)
+        hv = gen_rand_sting(self.SYM_EMAIL_CORR, 11)
+        hn = gen_rand_sting(string.digits + string.ascii_letters, 8)
+        test_data = [*create_empty_field_in_list([mac, hs, hv, hn]),
+                     (str_in_mac(gen_rand_sting(self.SYM_MUT, 12)), hs, hv, hn),
+                     (mac, gen_rand_sting(self.SYM_MUT, 12), hv, hn),
+                     (mac, hs, gen_rand_sting(self.SYM_MUT, 11), hn),
+                     (mac, hs, hv, gen_rand_sting(self.SYM_MUT, 8))]
+        return test_data
+
     def data_gen_ident_mutation(self, count):
-        sym_mut = self.TEST_SYM_MUT
+        sym_mut = self.SYM_MUT
         test_data = [
             (str_in_mac(zzuf(gen_rand_sting(string.hexdigits, 12), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(string.digits, 11), sym_mut, random.randint(1, 100)),
-             zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),#8
-             zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)))#10
-             # zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
+             zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),  # 8
+             zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)))  # 10
+            # zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
             for _ in range(count)]
         return test_data
 
     def data_gen_hash_format(self, count):
-        test_data = [" ".join(gen_rand_sting(string.hexdigits, 64))
-                     for _ in range(count)]
+        test_data = [
+            (chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10))),  # 1
+             chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)),  # 13
+             chr(0).join(gen_rand_sting(self.SYM_HEX, 64)))  # 64
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_hash_not_format(self):
+        path = chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10)))
+        file = chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13))
+        hash = chr(0).join(gen_rand_sting(self.SYM_HEX, 64))
+        test_data = [
+            *create_empty_field_in_list([path, file, hash]),
+            (chr(0).join(gen_rand_sting('\\/:*?"<>|', (1, 10))), file, hash),
+            (path, chr(0).join(gen_rand_sting('\\/:*?"<>|', 13)), hash),
+            (path, file, chr(0).join(gen_rand_sting(self.SYM_RUS, 64)))]
         return test_data
 
     def data_gen_hash_mutation(self, count):
-        sym_mut = self.TEST_SYM_MUT
-        test_data = [(" ".join(zzuf(gen_rand_sting(string.hexdigits, 64), sym_mut, random.randint(1, 100))))
-                     for _ in range(count)]
+        sym_mut = self.SYM_MUT
+        test_data = [
+            (zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10))), sym_mut, random.randint(1, 100)),  # 1
+             zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)), sym_mut, random.randint(1, 100)),  # 13
+             zzuf(chr(0).join(gen_rand_sting(self.SYM_HEX, 64)), sym_mut, random.randint(1, 100)))  # 64
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_trs_format(self, count):
+        test_data = [
+            (gen_rand_sting(self.SYM_MUT, 16),
+             # ("л{‡mҐU{E‰bщ	aзж",
+             #  "240 383 489")
+             str_in_id(gen_rand_sting(string.digits, 9)))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_trs_not_format(self):
+        test_data = [
+            (gen_rand_sting(self.SYM_MUT, random.randint(17, 30)), str_in_id(gen_rand_sting(string.digits, 9))),
+            (gen_rand_sting(self.SYM_MUT, 16), gen_rand_sting(string.digits, 9)),
+            (gen_rand_sting(self.SYM_MUT, 16), str_in_id(gen_rand_sting(string.digits, random.randint(10, 15)))),
+            (gen_rand_sting(self.SYM_MUT, 16), gen_rand_sting(string.ascii_letters, 9)),
+            (gen_rand_sting(self.SYM_MUT, 16), ""),
+            ("", str_in_id(gen_rand_sting(string.digits, 9)))
+        ]
+        return test_data
+
+    def data_gen_trs_mut(self, count):
+        sym_mut = self.SYM_MUT
+        test_data = [
+            (zzuf(gen_rand_sting(self.SYM_MUT, 16), sym_mut, random.randint(1, 100)),
+             str_in_id(zzuf(gen_rand_sting(string.digits, 9), sym_mut, random.randint(1, 100))))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_auth_format(self, count):
+        test_data = [
+            (chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 15))),
+             chr(0).join(gen_rand_sting(self.SYM_ENG_RUS, 8)))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_auth_not_format(self):
+        test_data = [
+            ("securityasta.ru", "security"),
+            ("security@aastru", "security"),
+            ("@astaaaaaaaa.ru", "security"),
+            ("securityaaaaaa@", "security"),
+            ("security@astaa.", "security"),
+            ("securitysecurity@ast.ru", ""),
+            ("security@asД.ru", "security"),
+            ("securitД@ast.ru", "security"),
+            ("security@ast.ru" * 18, "security"),
+            ("security@ast.ru", "security" * 18),
+            ("security@ast.ru", "securit" + chr(181))
+            ]
+        return test_data
+
+    def data_gen_auth_mut(self, count):
+        test_data = [
+            (" ".join(zzuf("security@ast.ru", self.SYM_MUT, random.randint(1, 100))),
+             " ".join(zzuf("security", self.SYM_MUT, random.randint(1, 100))))
+            for _ in range(count)]
         return test_data
 
 
+
+
 c = TestData()
-# print(c.TEST_SYM_EMAIL_CORR)
-[print(i) for i in c.data_gen_hash_format(3)]
+print(c.SYM_EMAIL_CORR)
+# [print(i) for i in c.data_gen_auth_format(4)]

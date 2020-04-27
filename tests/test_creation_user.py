@@ -23,6 +23,20 @@ def browser(browser):
     yield page
 
 
+@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(4))
+def test_create_user_generation(browser, email, name, password, phone, comment):
+    logg = log_for_tests(f_name="format_gen_create_user")
+    print("-------------------------------------------------------------------")
+    fields_tuple = email, name, password, password, phone, comment
+    logg.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+    logg.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
+    page.create_user(*fields_tuple)
+    page.get_text_alret()
+    page.open_page(Links.CREATE_USER_LINK)
+    page.check_user_in_bd(email)
+    logg.handlers.clear()
+
+
 @pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_mutation(4))
 def test_create_user_mutation(browser, email, name, password, phone, comment):
     log = log_for_tests(f_name="mutation_create_user")
@@ -37,22 +51,9 @@ def test_create_user_mutation(browser, email, name, password, phone, comment):
     log.handlers.clear()
 
 
-@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(4))
-def test_create_user_generation(browser, email, name, password, phone, comment):
-    log = log_for_tests(f_name="format_gen_create_user")
-    print("-------------------------------------------------------------------")
-    fields_tuple = email, name, password, password, phone, comment
-    log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
-    log.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
-    page.create_user(*fields_tuple)
-    page.get_text_alret()
-    page.open_page(Links.CREATE_USER_LINK)
-    page.check_user_in_bd(email)
-    log.handlers.clear()
-
-
 class TestCreateUserNotFormat():
     log = log_for_tests(f_name="not_format_gen_create_user")
+
     @pytest.mark.parametrize('email', [" ", "testtestmail.ru", "testtest@mailru",
                                        "testtestmailru", "testtestee" * 25 + "@mail.ru"])
     def test_email_field_not_format(self, browser, email):
@@ -82,7 +83,7 @@ class TestCreateUserNotFormat():
                                                 ("1qa@W", "1qa@W"), ("1qazWSX", "1qazWSX"), ("qaz@WSX", "qaz@WSX"),
                                                 ("1QAZ@WSX", "1QAZ@WSX"), ("1qaz@wsx", "1qaz@wsx"),
                                                 ("1qaz@WSX" * 17, "1qaz@WSX" * 17)])
-    def test_password_field_not_format(self, browser, passw, c_passw ):
+    def test_password_field_not_format(self, browser, passw, c_passw):
         print("\n-------------------------------------------------------------------")
         page.change_password_setting(6, "True", "True", "True", "True")
         self.log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
@@ -95,5 +96,3 @@ class TestCreateUserNotFormat():
         page.open_page(Links.CREATE_USER_LINK)
         page.change_password_setting()
         page.check_user_in_bd(email)
-
-
