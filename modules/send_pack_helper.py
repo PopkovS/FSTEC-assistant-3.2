@@ -64,8 +64,9 @@ def create_package_to_send_hash(path, file, hash):
 def create_package_to_send_trs(trs, id):
     with open('../packages/trsTest', 'rb') as file_in:
         text = file_in.read()
-        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode())
+        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode('cp1251'))
         text = text.replace(re.search(rb'\d{3}\s\d{3}\s\d{3}', text).group(0), id.encode())
+        print(text)
     with open(f"../packages/trsTest2", "wb") as file_out:
         file_out.write(text)
 
@@ -108,6 +109,8 @@ def write_in_pack(text, pack="identdata2"):
         with open(f"../packages/{pack}", "w", encoding='utf-8') as file_out:
             file_out.write(text)
 
+# def
+
 
 
 print("+++++++++++++++++++++++++++++++++++++++")
@@ -117,9 +120,9 @@ print("+++++++++++++++++++++++++++++++++++++++")
 #     l = re.search(r'Content-Length:.(\d*)\n\n', p).group(1)
 
 
-with open(fr'../packages/auth', 'rb') as pack:
+with open(fr'../packages/identdata', 'rb') as pack:
     p = pack.read()
     print(p)
-    r = re.search(rb'Content-Length:.\d*(\r\n\r\n.*)', p).group(1)
-    print(len(r))
-    print(r)
+    # r = re.search(rb'Content-Length:.\d*(\r\n\r\n.*)', p).group(1)
+    # print(len(r))
+    # print(r)

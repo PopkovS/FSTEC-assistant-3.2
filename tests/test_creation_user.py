@@ -1,13 +1,8 @@
-import datetime
-from time import sleep
-
-import string
 import pytest
+
 from modules.base_page import SeleniumHelper
-from modules.generator import zzuf, gen_rand_sting
-from modules.data import Locators, Links, Menu, Other, CreteUserPage, TestData
+from modules.data import Links, CreteUserPage, TestData
 from modules.logconf import log_for_tests
-import logging
 
 data = TestData()
 
@@ -24,7 +19,7 @@ def browser(browser):
 
 
 @pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(4))
-def test_create_user_generation(browser, email, name, password, phone, comment):
+def test_create_user_format(browser, email, name, password, phone, comment):
     logg = log_for_tests(f_name="format_gen_create_user")
     print("-------------------------------------------------------------------")
     fields_tuple = email, name, password, password, phone, comment

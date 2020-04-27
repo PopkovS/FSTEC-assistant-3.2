@@ -19,6 +19,6 @@ import sys
 #     print(hv, len(hv), sep="|  ---   ")
 #     print(hn, len(hn), sep="|  ---   ")
 
-a = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._"
+a = "Ф"
 
-print(a[12:20])
+print(a.encode("utf8"))

@@ -7,7 +7,7 @@ data = TestData()
 
 
 @pytest.mark.parametrize('path, file, hash', data.data_gen_hash_format(10))
-def test_send_hash_generation(path, file, hash):
+def test_send_hash_format(path, file, hash):
     create_package_to_send_hash(path, file, hash)
     sock_connect(ip="192.168.71.3", port=44334, pack_name="identdata2")
 
@@ -19,7 +19,6 @@ def test_send_hash_mutation(path, file, hash):
 
 
 @pytest.mark.parametrize('path, file, hash', data.data_gen_hash_not_format())
-# @pytest.mark.parametrize('path, file, hash', [("","dfsgsdfg","sdfgsdfgsdfg")])
 def test_send_hash_not_format(path, file, hash):
     print("\n" + path)
     print(file)

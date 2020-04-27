@@ -110,13 +110,13 @@ class TestData():
 
     def data_gen_ident_mutation(self, count):
         sym_mut = self.SYM_MUT
+        a = False
         test_data = [
             (str_in_mac(zzuf(gen_rand_sting(string.hexdigits, 12), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(string.digits, 11), sym_mut, random.randint(1, 100)),
              zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),  # 8
              zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)))  # 10
-            # zzuf(gen_rand_sting(self.TEST_SYM_EMAIL_CORR + [" "] * 10, 77), sym_mut, random.randint(1, 100))) #77
-            for _ in range(count)]
+            for _ in range(count) if a]
         return test_data
 
     def data_gen_hash_format(self, count):
@@ -149,9 +149,7 @@ class TestData():
 
     def data_gen_trs_format(self, count):
         test_data = [
-            (gen_rand_sting(self.SYM_MUT, 16),
-             # ("л{‡mҐU{E‰bщ	aзж",
-             #  "240 383 489")
+            (gen_rand_sting(self.SYM_ENG_RUS, 16),
              str_in_id(gen_rand_sting(string.digits, 9)))
             for _ in range(count)]
         return test_data
@@ -195,7 +193,7 @@ class TestData():
             ("security@ast.ru" * 18, "security"),
             ("security@ast.ru", "security" * 18),
             ("security@ast.ru", "securit" + chr(181))
-            ]
+        ]
         return test_data
 
     def data_gen_auth_mut(self, count):
@@ -206,8 +204,5 @@ class TestData():
         return test_data
 
 
-
-
 c = TestData()
-print(c.SYM_EMAIL_CORR)
 # [print(i) for i in c.data_gen_auth_format(4)]
