@@ -12,7 +12,6 @@ def create_sequence(*args):
 
 
 def gen_rand_sting(chr_str, len_srt):
-    # print(f"test test:  {random.randint(*len_srt)}")
     if str(type(len_srt)) == "<class 'int'>":
         rand_str = "".join([random.choice(chr_str) for _ in range(len_srt)])
     elif str(type(len_srt)) == "<class 'tuple'>":
@@ -66,19 +65,12 @@ def str_in_access_token_four_dots(text):
     assert len(text) >= 9, f'В тексте должно быть минимум 9 символов, три из них будут заменены на "."'
     list_text = list(text)
     one_index = random.randint(1, len(text[1:-7]))
-    print(one_index)
     two_index = random.randint(one_index + 2, len(text[:-6]))
-    print(f"two_index {two_index}")
     thrid_index = random.randint(two_index + 2, len(text[:-4]))
-    print(f"thrid_index {thrid_index}")
     fourth_index = random.randint(thrid_index + 2, len(text[:-2]))
-    print("fourth_index", fourth_index)
     for i in [one_index, two_index, thrid_index, fourth_index]:
         list_text[i] = "."
     return "".join(list_text)
-
-
-# [print(str_in_access_token_one_dots("123")) for _ in range(1000)]
 
 
 def str_in_mac(text):
@@ -101,7 +93,7 @@ def create_empty_field_in_list(lst):
         res.append(tuple(l))
     return res
 
-# print(str_in_id("4561237893424"))
+
 # print(string.ascii_lowercase)
 # print(string.ascii_letters)
 # print(string.ascii_uppercase)
@@ -111,4 +103,3 @@ def create_empty_field_in_list(lst):
 # print(string.punctuation)
 # print(string.printable)
 # print(string.hexdigits)
-# print(" ".join("dsffsdafasdfsdfasdfsdfasdfasdf"))

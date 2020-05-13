@@ -17,14 +17,13 @@ def sock_connect(ip='192.168.71.03', port=44334, pack_name=""):
     sock.connect((ip, port))
     text = open(os.path.join(ROOT_DIR, "packages", pack_name), 'rb').read()
     sock.sendall(text)
-    print_response(sock)
+    # print_response(sock)
     return sock
 
 
 def print_response(sock):
     data = sock.recv(1024).decode("utf-8", errors="replace")
     sock.close()
-    print(data)
 
 
 def recount_length(my_filename="identdata2"):
@@ -32,7 +31,6 @@ def recount_length(my_filename="identdata2"):
         text = file_in.read()
         text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
                             str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
-        print(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1)))
     write_in_pack(text)
 
 
@@ -47,8 +45,8 @@ def recount_length_auth():
                 file_out.write(text)
 
 
-def create_package_to_send_ident(mac, hs, hv, hn):
-    with open(os.path.join(ROOT_DIR, "packages", "identdata")) as file_in:
+def create_package_to_send_ident(mac, hs, hv, hn, new_file, original_file="identdata"):
+    with open(os.path.join(ROOT_DIR, "packages", original_file)) as file_in:
         text = file_in.read()
         text = text.replace(re.search(r'M(\w\w-\w\w-\w\w-\w\w-\w\w-\w\w)', text).group(1), mac)
         text = text.replace(re.search(r'HS(\d*)', text).group(1), hs)
@@ -56,7 +54,7 @@ def create_package_to_send_ident(mac, hs, hv, hn):
         text = text.replace(re.search(r'HN(.*)C', text).group(1), hn)
         text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
                             str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
-    write_in_pack(text)
+    write_in_pack(text, pack=new_file)
 
 
 def create_package_to_send_hash(path, file, hash):
@@ -69,24 +67,27 @@ def create_package_to_send_hash(path, file, hash):
     write_in_pack(text)
 
 
-def create_package_to_send_trs(trs, id):
-    with open(os.path.join(ROOT_DIR, "packages", "trsTest"), "rb") as file_in:
+def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTest2"):
+    with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
         text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode("cp1251"))
         text = text.replace(re.search(rb'\d{3}\s\d{3}\s\d{3}', text).group(0), id.encode())
-        print(text)
-    with open(os.path.join(ROOT_DIR, "packages", "trsTest2"), "wb") as file_out:
+    with open(os.path.join(ROOT_DIR, "packages", new_file), "wb") as file_out:
         file_out.write(text)
 
 
-def create_package_to_send_auth(login, password):
-    with open('../packages/auth', 'rb') as file_in:
+def create_package_to_send_auth(login, password, original_file='auth', new_file="auth2"):
+    with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
+        print(text)
         text = text.replace(re.search(rb'p.1..(.+?)..p.2..', text).group(1), login.encode())
-        text = text.replace(re.search(rb'.p.2..(.+?)..p.3.', text).group(1), password.encode())
-        text = text.replace(re.search(rb'Content-Length:.(\d*)\r\n\r\n', text).group(1),
-                            str(len(re.search(rb'Content-Length:.\d*\r\n\r\n(.*)', text).group(1))).encode())
-    with open(f"../packages/auth2", "wb") as file_out:
+        print("\n")
+        print(password.encode())
+        print(rb"p\x002\x00\x02\x00" + password.encode())
+        text = text.replace(re.search(rb'.(p.2..+?)..p.3.', text).group(1), b"p\x002\x00\x02\x00" + password.encode())
+        # text = text.replace(re.search(rb'Content-Length:.(\d*)\r\n\r\n', text).group(1),
+        #                     str(len(re.search(rb'Content-Length:.\d*\r\n\r\n(.*)', text).group(1).decode(errors="replace"))).encode())
+    with open(os.path.join(ROOT_DIR, "packages", new_file), "wb") as file_out:
         file_out.write(text)
 
 
@@ -98,12 +99,6 @@ def create_package_to_recv_auth(access="", refresh="", expires="", email="", id=
         text = text.replace(re.search(r'.D.4..(.+?)..D.5.', text).group(1), expires) if expires else text
         text = text.replace(re.search(r'.D.5..(.+?)..D.6.', text).group(1), email) if email else text
         text = text.replace(re.search(r'.D.6..(.+?)..D.7.', text).group(1), id) if id else text
-        print(access)
-        print(refresh)
-        print(expires)
-        print(email)
-        print(id)
-        print(text)
     write_in_pack(text, pack="func1_2")
 
 
@@ -127,7 +122,6 @@ def create_package_without(par, original_file='identdata', new_file="identdata2"
             with open(f'../packages/{original_file}') as file_in:
                 text = file_in.read()
                 text = text.replace(re.search(i, text).group(1), "")
-                print(text)
                 write_in_pack(text, pack=new_file)
 
 

@@ -242,7 +242,6 @@ class TestData():
         return test_data
 
     def data_gen_recv_auth_not_format_refresh(self):
-        # token_sym = string.digits + string.ascii_letters + "+/"
         test_data = [
             chr(0).join(str_in_access_token(gen_rand_sting(self.SYM_MUT, 365))),
             chr(0)
@@ -271,12 +270,3 @@ class TestData():
         ]
         return test_data
 
-
-c = TestData()
-# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[0]))
-# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[1]))
-# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[2]))
-# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[3]))
-
-# [print(*i, sep=" || ") for i in c.data_gen_recv_auth_not_format_access(10)]
-# [print(*c.data_gen_recv_auth_not_format_access(1)[1]) for _ in range(100)]
