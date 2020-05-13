@@ -33,13 +33,52 @@ def zzuf(text, chr_seq, pr=int(random.randint(1, 100))):
 
 
 def str_in_email(text):
-    assert len(text) >= 5, f'В тесте должно быть минимум 5 символов, два из них будут заменены на "@" и "."'
+    assert len(text) >= 5, f'В тексте должно быть минимум 5 символов, два из них будут заменены на "@" и "."'
     list_text = list(text)
     one_index = random.randint(1, len(text[1:-3]))
     two_index = random.randint(one_index + 2, len(text[:-2]))
     for i, j in zip(["@", "."], [one_index, two_index]):
         list_text[j] = i
     return "".join(list_text)
+
+
+def str_in_access_token(text):
+    assert len(text) >= 5, f'В тексте должно быть минимум 7 символов, три из них будут заменены на "."'
+    list_text = list(text)
+    one_index = random.randint(1, len(text[1:-3]))
+
+    two_index = random.randint(one_index + 2, len(text[:-2]))
+
+    for i in [one_index, two_index]:
+        list_text[i] = "."
+    return "".join(list_text)
+
+
+def str_in_access_token_one_dots(text):
+    assert len(text) >= 3, f'В тексте должно быть минимум 3 символов, три из них будут заменены на "."'
+    list_text = list(text)
+    one_index = random.randint(1, len(text[1:-1]))
+    list_text[one_index] = "."
+    return "".join(list_text)
+
+
+def str_in_access_token_four_dots(text):
+    assert len(text) >= 9, f'В тексте должно быть минимум 9 символов, три из них будут заменены на "."'
+    list_text = list(text)
+    one_index = random.randint(1, len(text[1:-7]))
+    print(one_index)
+    two_index = random.randint(one_index + 2, len(text[:-6]))
+    print(f"two_index {two_index}")
+    thrid_index = random.randint(two_index + 2, len(text[:-4]))
+    print(f"thrid_index {thrid_index}")
+    fourth_index = random.randint(thrid_index + 2, len(text[:-2]))
+    print("fourth_index", fourth_index)
+    for i in [one_index, two_index, thrid_index, fourth_index]:
+        list_text[i] = "."
+    return "".join(list_text)
+
+
+# [print(str_in_access_token_one_dots("123")) for _ in range(1000)]
 
 
 def str_in_mac(text):

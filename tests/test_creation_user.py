@@ -18,7 +18,8 @@ def browser(browser):
     yield page
 
 
-@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_format(4))
+@pytest.mark.parametrize('email, name, password, phone, comment',
+                         data.data_gen_create_user_format(100))
 def test_create_user_format(browser, email, name, password, phone, comment):
     logg = log_for_tests(f_name="format_gen_create_user")
     print("-------------------------------------------------------------------")
@@ -32,7 +33,8 @@ def test_create_user_format(browser, email, name, password, phone, comment):
     logg.handlers.clear()
 
 
-@pytest.mark.parametrize('email, name, password, phone, comment', data.data_gen_create_user_mutation(4))
+@pytest.mark.parametrize('email, name, password, phone, comment',
+                         data.data_gen_create_user_mutation(1300))
 def test_create_user_mutation(browser, email, name, password, phone, comment):
     log = log_for_tests(f_name="mutation_create_user")
     print("-------------------------------------------------------------------")

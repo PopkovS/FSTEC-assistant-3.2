@@ -1,11 +1,11 @@
+import os
 import random
 import string
 
 from selenium.webdriver.common.by import By
 
 # from faker import Faker
-from modules.generator import gen_rand_sting, create_sequence, str_in_email, str_in_mac, str_in_id, zzuf, \
-    create_empty_field_in_list
+from modules.generator import *
 
 
 class Locators():
@@ -50,6 +50,10 @@ class Links():
     MAIN_LINK = "http://lk.3-2.ast.safib.ru/"
     LOGIN_LINK = MAIN_LINK + "/Account/Login"
     CREATE_USER_LINK = MAIN_LINK + "/User/Create"
+
+
+class Path():
+    ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestData():
@@ -110,13 +114,12 @@ class TestData():
 
     def data_gen_ident_mutation(self, count):
         sym_mut = self.SYM_MUT
-        a = False
         test_data = [
             (str_in_mac(zzuf(gen_rand_sting(string.hexdigits, 12), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(string.digits, 11), sym_mut, random.randint(1, 100)),
              zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, 8), sym_mut, random.randint(1, 100)),  # 8
              zzuf(gen_rand_sting(string.digits + string.ascii_letters, 10), sym_mut, random.randint(1, 100)))  # 10
-            for _ in range(count) if a]
+            for _ in range(count)]
         return test_data
 
     def data_gen_hash_format(self, count):
@@ -203,6 +206,77 @@ class TestData():
             for _ in range(count)]
         return test_data
 
+    def data_gen_recv_auth_format(self, count):
+        token_sym = string.digits + string.ascii_letters + "/"
+        test_data = [
+            ((chr(0).join(str_in_access_token(gen_rand_sting(token_sym, 365)))),
+             (chr(0).join(gen_rand_sting(token_sym, 72))),
+             (chr(0).join(gen_rand_sting(string.digits, 4))),
+             (chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 16)))),
+             (chr(0).join(gen_rand_sting(string.digits, 3))))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_recv_auth_mut(self, count):
+        token_sym = string.digits + string.ascii_letters + "/"
+        test_data = [
+            ((chr(0).join(
+                str_in_access_token(zzuf(gen_rand_sting(token_sym, 365), self.SYM_MUT, random.randint(1, 100))))),
+             (chr(0).join(zzuf(gen_rand_sting(token_sym, 72), self.SYM_MUT, random.randint(1, 100)))),
+             (chr(0).join(zzuf(gen_rand_sting(string.digits, 4), self.SYM_MUT, random.randint(1, 100)))),
+             (chr(0).join(
+                 str_in_email(zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, 16), self.SYM_MUT, random.randint(1, 100))))),
+             (chr(0).join(zzuf(gen_rand_sting(string.digits, 3), self.SYM_MUT, random.randint(1, 100)))))
+            for _ in range(count)]
+        return test_data
+
+    def data_gen_recv_auth_not_format_access(self):
+        token_sym = string.digits + string.ascii_letters + "/"
+        test_data = [
+            chr(0).join(str_in_access_token_one_dots(gen_rand_sting(token_sym, 365))),
+            chr(0).join(gen_rand_sting(token_sym, 365)),
+            chr(0).join(str_in_access_token_four_dots(gen_rand_sting(token_sym, 365))),
+            chr(0).join(str_in_access_token(gen_rand_sting(self.SYM_MUT, 365))),
+            chr(0)
+        ]
+        return test_data
+
+    def data_gen_recv_auth_not_format_refresh(self):
+        # token_sym = string.digits + string.ascii_letters + "+/"
+        test_data = [
+            chr(0).join(str_in_access_token(gen_rand_sting(self.SYM_MUT, 365))),
+            chr(0)
+        ]
+        return test_data
+
+    def data_gen_recv_auth_not_format_email(self):
+        test_data = [
+            chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 16)).replace(".", "x")),
+            chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 16)).replace("@", "x")),
+            chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 16)).replace("@", "x").replace(".", "x")),
+            chr(0).join(gen_rand_sting(self.SYM_EMAIL_CORR, 8) + "@"),
+            chr(0).join("@" + gen_rand_sting(self.SYM_EMAIL_CORR, 8) + ".ru"),
+            chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 259))),
+            chr(0).join(str_in_email(gen_rand_sting(self.SYM_MUT, 18))),
+            chr(0)
+        ]
+        return test_data
+
+    def data_gen_recv_auth_not_format_expires_and_id(self):
+        test_data = [
+            (chr(0).join(gen_rand_sting(self.SYM_MUT, 18)), chr(0).join(gen_rand_sting(string.digits, 3))),
+            (chr(0), chr(0).join(gen_rand_sting(string.digits, 3))),
+            (chr(0).join(gen_rand_sting(string.digits, 4)), chr(0).join(gen_rand_sting(self.SYM_MUT, 3))),
+            (chr(0).join(gen_rand_sting(string.digits, 4)), chr(0)),
+        ]
+        return test_data
+
 
 c = TestData()
-# [print(i) for i in c.data_gen_auth_format(4)]
+# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[0]))
+# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[1]))
+# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[2]))
+# print(chr(0).join(c.data_gen_recv_auth_not_format_email()[3]))
+
+# [print(*i, sep=" || ") for i in c.data_gen_recv_auth_not_format_access(10)]
+# [print(*c.data_gen_recv_auth_not_format_access(1)[1]) for _ in range(100)]
