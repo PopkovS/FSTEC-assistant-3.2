@@ -93,7 +93,13 @@ class SeleniumHelper():
             sequence = sequence + [chr(i) for i in range(x, y)]
         return sequence
 
+    def check_login_user(self):
+        if "/Account/Login" in self.browser.current_url:
+            self.login(email="test@safib.ru", password="1")
+            self.browser.get(Links.CREATE_USER_LINK)
+
     def create_user(self, email='', name='', password='', c_password='', phone='', comment=''):
+        self.check_login_user()
         logger = logging.getLogger('base_test.create_us_form')
 
         fields = {
@@ -154,5 +160,6 @@ class SeleniumHelper():
     def clean_aspnetusers(self, email="testtest@mail.ru"):
         pgdb.delete_row(table='"AspNetUsers"', column='"Email"', val=("'%s'" % email))
 
-    def change_password_setting(self, pas_len=1, one_sym="False", one_dig="False", one_lower="False", one_upper="False"):
+    def change_password_setting(self, pas_len=1, one_sym="False", one_dig="False", one_lower="False",
+                                one_upper="False"):
         pgdb.change_password_param(pas_len, one_sym, one_dig, one_lower, one_upper)

@@ -33,6 +33,7 @@ def check_user_exist(user):
     aspNetUsers = bool(cursor.fetchall())
     assert astusers == aspNetUsers, f"Ответ от таблиц отличается. " \
                                     f"astusers = '{astusers}', AspNetUsers = '{aspNetUsers}'"
+    db_disconnect()
     return astusers and aspNetUsers
 
 
@@ -46,6 +47,7 @@ def check_user_binding_with_ad(user):
     assert bool(objectguid) == bool(distinguishedname), f'Отличаются наполнение в ячейках: \n' \
                                                         f'objectguid = {bool(objectguid)}\n' \
                                                         f'distinguishedname = {bool(distinguishedname)}'
+    db_disconnect()
     return bool(objectguid) and bool(distinguishedname)
 
 
@@ -55,6 +57,7 @@ def unbinding_user_from_ad(user):
         change_cells(table="astusers", column="distinguishedname", new_val="", where_col="email", where_val=user)
         assert not check_user_binding_with_ad(user), \
             f'Неплоучилось отвязать пользователя "{user}" от AD что то пошло не так'
+        db_disconnect()
 
 
 def get_id_user(user):
@@ -66,6 +69,7 @@ def get_id_user(user):
     result = cursor.fetchall()
     if result:
         return result[0][0]
+    db_disconnect()
 
 
 def change_cells(table, column, new_val, where_col="email", where_val=""):
@@ -98,10 +102,12 @@ def change_stausid(stat=0, user=''):
     assert check_user_exist(user), f"Невозможно изменить данные, Пользователя {user} нет в базе"
     change_cells(table="astusers", column="status", new_val=stat, where_val=user)
     change_cells(table="\"AspNetUsers\"", column="\"Status\"", new_val=stat, where_col="\"Email\"", where_val=user)
+    db_disconnect()
 
 
 def change_direct_control(val="True"):
     change_cells(table="systemparameters", column="value", new_val=val, where_col="type", where_val=118)
+    db_disconnect()
 
 
 def change_auth_ad(val="True"):
@@ -111,6 +117,7 @@ def change_auth_ad(val="True"):
                      where_col="type", where_val=136)
     else:
         change_cells(table="systemparameters", column="value", new_val="", where_col="type", where_val=136)
+    db_disconnect()
 
 
 def change_twofactor(val="true", user=""):
@@ -118,6 +125,7 @@ def change_twofactor(val="true", user=""):
     change_cells(table="astusers", column="twofactorsignneeded", new_val=val)
     change_cells(table='"AspNetUsers"', column='"TwoFactorEnabled"', new_val=val, where_col='"Email"',
                  where_val=user)
+    db_disconnect()
 
 
 def del_new_user(user):
@@ -127,6 +135,8 @@ def del_new_user(user):
                val=(f"'{id}'"))
     delete_row(table='"AspNetUsers"', column='"Email"', val=(f"'{user}'"))
     delete_row(table='astusers', column='email', val=(f"'{user}'"))
+    db_disconnect()
+
 
 def change_password_param(pas_len=1, one_sym="False", one_dig="False", one_lower="False", one_upper="False"):
     change_cells(table="systemparameters", column="value", new_val=pas_len, where_col="type", where_val=120)
@@ -134,4 +144,4 @@ def change_password_param(pas_len=1, one_sym="False", one_dig="False", one_lower
     change_cells(table="systemparameters", column="value", new_val=one_dig, where_col="type", where_val=122)
     change_cells(table="systemparameters", column="value", new_val=one_lower, where_col="type", where_val=123)
     change_cells(table="systemparameters", column="value", new_val=one_upper, where_col="type", where_val=124)
-
+    db_disconnect()

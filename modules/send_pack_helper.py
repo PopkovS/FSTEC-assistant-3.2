@@ -12,12 +12,14 @@ from definitions import ROOT_DIR
 import binascii
 
 
-def sock_connect(ip='192.168.71.03', port=44334, pack_name=""):
+def sock_connect(ip='192.168.71.03', port=44334, pack_name="", get_response=True):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     text = open(os.path.join(ROOT_DIR, "packages", pack_name), 'rb').read()
     sock.sendall(text)
-    # print_response(sock)
+    if get_response:
+        # print_response(sock)
+        sock.recv(1024).decode("utf-8", errors="replace")
     return sock
 
 
@@ -57,20 +59,20 @@ def create_package_to_send_ident(mac, hs, hv, hn, new_file, original_file="ident
     write_in_pack(text, pack=new_file)
 
 
-def create_package_to_send_hash(path, file, hash):
-    with open(os.path.join(ROOT_DIR, "packages", "identdata")) as file_in:
+def create_package_to_send_hash(path, file, hash, new_file="identdata2", original_file="identdata"):
+    with open(os.path.join(ROOT_DIR, "packages", original_file)) as file_in:
         text = file_in.read()
         text = text.replace(re.search(r'.A.s.s.i.s.t.a.n.t...e.x.e..S.2.5.6..(.+?)..L..', text).group(1), hash)
         text = text.replace(re.search(r'..L..(.+?)..N', text).group(0),
                             b"\x00\x00L\x00\x02\x00".decode("utf8") + path + b"\x00\x03\x00N".decode("utf8"))
         text = text.replace(re.search(r'.N..(.+?)..S.2.5.6.', text).group(1), file)
-    write_in_pack(text)
+    write_in_pack(text, pack=new_file)
 
 
 def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTest2"):
     with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
-        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode("cp1251"))
+        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode("cp1251", "replace"))
         text = text.replace(re.search(rb'\d{3}\s\d{3}\s\d{3}', text).group(0), id.encode())
     with open(os.path.join(ROOT_DIR, "packages", new_file), "wb") as file_out:
         file_out.write(text)
@@ -152,13 +154,13 @@ def send_func(conn, file_func="func1_2"):
 
 
 def stop_app():
-    sess = winrm.Session('c421varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
     sess.run_cmd('taskkill /IM assistant.exe /F')
 
 
 def answer_id_srv_check():
     loggen = logging.getLogger('base_test.answer')
-    sess = winrm.Session('c421varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
     r = sess.run_cmd('type "C:\Program Files (x86)\Ассистент\log\AstCln*"')
     if "Answer id-srv for func #1 process done" in r.std_out.decode("utf8", "replace"):
         loggen.debug('Получено ответ от клиента: "Ansdwer id-srv for func #1 process done"')
@@ -169,5 +171,5 @@ def answer_id_srv_check():
 
 
 def delete_all_log_file():
-    sess = winrm.Session('c421varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
     sess.run_cmd('DEL /F /S /Q /A "C:\Program Files (x86)\Ассистент\log\*"')

@@ -48,8 +48,11 @@ class CreteUserPage():
 
 class Links():
     MAIN_LINK = "http://lk.3-2.ast.safib.ru/"
+    MAIN_LINK_LIN = "http://lk.3.2-linux.ast.safib.ru/"
     LOGIN_LINK = MAIN_LINK + "/Account/Login"
+    LOGIN_LINK_LIN = MAIN_LINK_LIN + "/Account/Login"
     CREATE_USER_LINK = MAIN_LINK + "/User/Create"
+    CREATE_USER_LINK_LIN = MAIN_LINK_LIN + "/User/Create"
 
 
 class Path():

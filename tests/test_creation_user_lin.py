@@ -14,7 +14,7 @@ def browser(browser):
     page.change_sys_paran(dir_control="True")
     page.open()
     page.login(email="test@safib.ru", password="1")
-    browser.get(Links.CREATE_USER_LINK)
+    browser.get(Links.CREATE_USER_LINK_LIN)
     yield page
 
 
@@ -23,7 +23,7 @@ def browser(browser):
 def test_create_user_format(browser, email, name, password, phone, comment):
     logg = log_for_tests(f_name="format_gen_create_user")
     fields_tuple = email, name, password, password, phone, comment
-    logg.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+    logg.debug(f"Переход на форму создания пользователя 'http://lk.3.2-linux.ast.safib.ru/User'")
     logg.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
     page.create_user(*fields_tuple)
     page.get_text_alret()
@@ -37,7 +37,7 @@ def test_create_user_format(browser, email, name, password, phone, comment):
 def test_create_user_mutation(browser, email, name, password, phone, comment):
     log = log_for_tests(f_name="mutation_create_user")
     fields_tuple = email, name, password, password, phone, comment
-    log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+    log.debug(f"Переход на форму создания пользователя 'http://lk.3.2-linux.ast.safib.ru/'")
     log.info(f"Запуск теста cо следующими занчениями полей: {fields_tuple}")
     page.create_user(*fields_tuple)
     page.get_text_alret()
@@ -62,7 +62,7 @@ class TestCreateUserNotFormat():
 
     @pytest.mark.parametrize('name', [" ", "testtestee" * 26])
     def test_name_field_not_format(self, browser, name):
-        self.log.debug(f"Переход на форму создания пользователя 'http://lk.3-2.ast.safib.ru/User'")
+        self.log.debug(f"Переход на форму создания пользователя 'http://lk.3.2-linux.ast.safib.ru/'")
         self.log.info(f"Запуск теста c name: '{name}'")
         email = "testtest@mail.ru"
         page.create_user(email=email, name=name, password="123", c_password="123")
