@@ -11,7 +11,7 @@ now = datetime.datetime.now()
 f = data.data_gen_ident_format(10)
 
 
-@pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_format(1))
+@pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_format(1000))
 def test_send_ident_format(mac, hs, hv, hn):
     create_package_to_send_ident(mac, hs, hv, hn)
     sock_connect(ip="192.168.71.3", port=44334, pack_name="identdata2")

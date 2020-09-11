@@ -20,6 +20,7 @@ def sock_connect(ip='192.168.71.03', port=44334, pack_name="", get_response=True
     if get_response:
         # print_response(sock)
         sock.recv(1024).decode("utf-8", errors="replace")
+        # print(sock.recv(1024).decode("utf-8", errors="replace"))
     return sock
 
 
@@ -47,15 +48,16 @@ def recount_length_auth():
                 file_out.write(text)
 
 
-def create_package_to_send_ident(mac, hs, hv, hn, new_file, original_file="identdata"):
+def create_package_to_send_ident(mac, hs, hv, hn, new_file="identdata2", original_file="identdata", recount=True):
     with open(os.path.join(ROOT_DIR, "packages", original_file)) as file_in:
         text = file_in.read()
         text = text.replace(re.search(r'M(\w\w-\w\w-\w\w-\w\w-\w\w-\w\w)', text).group(1), mac)
         text = text.replace(re.search(r'HS(\d*)', text).group(1), hs)
         text = text.replace(re.search(r'HV(.*)HN', text).group(1), hv)
         text = text.replace(re.search(r'HN(.*)C', text).group(1), hn)
-        text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
-                            str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
+        if recount:
+            text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
+                                str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
     write_in_pack(text, pack=new_file)
 
 
@@ -72,7 +74,8 @@ def create_package_to_send_hash(path, file, hash, new_file="identdata2", origina
 def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTest2"):
     with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
-        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1), trs.encode("cp1251", "replace"))
+        text = text.replace(re.search(rb'.{8}(.*).{4}\d{3}\s\d{3}\s\d{3}', text).group(1),
+                            trs.encode("cp1251", "replace"))
         text = text.replace(re.search(rb'\d{3}\s\d{3}\s\d{3}', text).group(0), id.encode())
     with open(os.path.join(ROOT_DIR, "packages", new_file), "wb") as file_out:
         file_out.write(text)
@@ -81,12 +84,13 @@ def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTe
 def create_package_to_send_auth(login, password, original_file='auth', new_file="auth2"):
     with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
-        print(text)
+        # print(text)
         text = text.replace(re.search(rb'p.1..(.+?)..p.2..', text).group(1), login.encode())
-        print("\n")
-        print(password.encode())
-        print(rb"p\x002\x00\x02\x00" + password.encode())
-        text = text.replace(re.search(rb'.(p.2..+?)..p.3.', text).group(1), b"p\x002\x00\x02\x00" + password.encode())
+        # print("\n")
+        # print(password.encode())
+        # print(rb"p\x002\x00\x02\x00" + b"  " + password.encode())
+        text = text.replace(re.search(rb'.(p.2..+?)..p.3.', text).group(1),
+                            b"p\x002\x00\x02\x00" + password.encode())
         # text = text.replace(re.search(rb'Content-Length:.(\d*)\r\n\r\n', text).group(1),
         #                     str(len(re.search(rb'Content-Length:.\d*\r\n\r\n(.*)', text).group(1).decode(errors="replace"))).encode())
     with open(os.path.join(ROOT_DIR, "packages", new_file), "wb") as file_out:
@@ -163,7 +167,7 @@ def answer_id_srv_check():
     sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
     r = sess.run_cmd('type "C:\Program Files (x86)\Ассистент\log\AstCln*"')
     if "Answer id-srv for func #1 process done" in r.std_out.decode("utf8", "replace"):
-        loggen.debug('Получено ответ от клиента: "Ansdwer id-srv for func #1 process done"')
+        loggen.debug('Получено ответ от клиента: "Answer id-srv for func #1 process done"')
         return True
     else:
         loggen.debug('Не удалось получить ответ от клиета')
@@ -173,3 +177,10 @@ def answer_id_srv_check():
 def delete_all_log_file():
     sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
     sess.run_cmd('DEL /F /S /Q /A "C:\Program Files (x86)\Ассистент\log\*"')
+
+# with open(os.path.join(ROOT_DIR, "packages", "ident_lin")) as file_in:
+#     text = file_in.read()
+#     print(re.search(r'M(\w\w-\w\w-\w\w-\w\w-\w\w-\w\w)', text).group(1))
+#     print(len(re.search(r'HS(\d*)', text).group(1)))
+#     print(len(re.search(r'HV(.*)HN', text).group(1)))
+#     print(len(re.search(r'HN(.*)C', text).group(1)))

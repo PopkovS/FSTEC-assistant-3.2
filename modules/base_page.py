@@ -47,7 +47,7 @@ class SeleniumHelper():
             return False
         return True
 
-    def login(self, email, password, name_user="Администратор безопасности"):
+    def login(self, email, password, name_user="Администратор системы"):
         email_field = self.browser.find_element(*Locators.EMAIL_FIELD)
         email_field.send_keys(email)
         password_field = self.browser.find_element(*Locators.PASSWORD_USER_FIELD)
@@ -94,7 +94,10 @@ class SeleniumHelper():
         return sequence
 
     def check_login_user(self):
+        print(self.browser.current_url)
         if "/Account/Login" in self.browser.current_url:
+            print(self.browser.current_url)
+            print("Пользоватекль не залогинен")
             self.login(email="test@safib.ru", password="1")
             self.browser.get(Links.CREATE_USER_LINK)
 
@@ -115,7 +118,7 @@ class SeleniumHelper():
                 val[0].clear()
                 val[0].send_keys(val[1])
 
-                logger.info(f"Полю '{field}' приствоенно значение '{val[1]}'")
+                logger.info(f"Полю '{field}' присвоено значение '{val[1]}'")
             else:
                 continue
         submit_but = self.browser.find_element(*CreteUserPage.SUBMIT)
@@ -126,8 +129,8 @@ class SeleniumHelper():
         logger = logging.getLogger('base_test.check_user_in_bd')
         if email:
             if pgdb.check_user_exist(email):
-                logger.info(f"Пользоваетль '{email}' успешно создан")
-                print(f"Пользоваетль '{email}' успешно создан")
+                logger.info(f"Пользователь '{email}' успешно создан")
+                print(f"Пользователь '{email}' успешно создан")
                 pgdb.del_new_user(email)
                 logger.info(f"Удаление данных пользователя '{email}' из БД")
                 print(f"Удаление данных пользователя '{email}' из БД")
@@ -148,7 +151,7 @@ class SeleniumHelper():
         logger = logging.getLogger('base_test.message_field')
         if self.is_element_present(*field, timeout=1):
             err_mes = self.browser.find_element(*field)
-            logger.debug(f' Сообщение на под полем email: "{err_mes.text}"')
+            logger.debug(f' Сообщение под полем email: "{err_mes.text}"')
             print(f"Сообщение под полем {f_name}: '{err_mes.text}'")
 
     def check_phone(self, email='testtest@mail.ru'):

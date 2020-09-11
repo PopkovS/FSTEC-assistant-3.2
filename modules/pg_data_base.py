@@ -7,8 +7,8 @@ import psycopg2
 # assistant-test-v3.2F_corp_core
 # def db_connect(dbname='assistant_test_corp_linux', user='postgres',
 #                password='1q2w3e', host='192.168.70.220'):
-def db_connect(dbname='assistant_test_v3.2F_corp_core', user='postgres',
-               password='1q2w3e', host='192.168.70.220'):
+def db_connect(dbname='assistant_test_v3.4F_corp_core', user='postgres',
+               password='1q2w3e', host='192.168.70.220'): #dbname='assistant_test_v3.2F_corp_core' - для 32
     conn = psycopg2.connect(dbname=dbname, user=user,
                             password=password, host=host)
     cursor = conn.cursor()
@@ -68,8 +68,8 @@ def get_id_user(user):
                    f' WHERE email=$${user}$$')
     result = cursor.fetchall()
     if result:
+        db_disconnect()
         return result[0][0]
-    db_disconnect()
 
 
 def change_cells(table, column, new_val, where_col="email", where_val=""):
@@ -145,3 +145,10 @@ def change_password_param(pas_len=1, one_sym="False", one_dig="False", one_lower
     change_cells(table="systemparameters", column="value", new_val=one_lower, where_col="type", where_val=123)
     change_cells(table="systemparameters", column="value", new_val=one_upper, where_col="type", where_val=124)
     db_disconnect()
+
+
+if __name__ == "__main__":
+    del_new_user("")
+
+
+

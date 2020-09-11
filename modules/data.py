@@ -47,8 +47,8 @@ class CreteUserPage():
 
 
 class Links():
-    MAIN_LINK = "http://lk.3-2.ast.safib.ru/"
-    MAIN_LINK_LIN = "http://lk.3.2-linux.ast.safib.ru/"
+    MAIN_LINK = "http://lk.3-4.ast.safib.ru/"
+    MAIN_LINK_LIN = "http://lk.3.4-linux.ast.safib.ru/"
     LOGIN_LINK = MAIN_LINK + "/Account/Login"
     LOGIN_LINK_LIN = MAIN_LINK_LIN + "/Account/Login"
     CREATE_USER_LINK = MAIN_LINK + "/User/Create"
@@ -82,7 +82,7 @@ class TestData():
 
     def data_gen_create_user_mutation(self, count):
         sym_list = self.SYM_ENG_RUS
-        sym_mut = self.SYM_MUT
+        sym_mut = self.SYM_MUT.replace("$", "a")
         test_data = [
             (str_in_email(zzuf(gen_rand_sting(self.SYM_EMAIL_CORR, (5, 256)), sym_mut, random.randint(1, 100))),
              zzuf(gen_rand_sting(sym_list, (1, 256)), sym_mut, random.randint(1, 100)),
@@ -98,7 +98,7 @@ class TestData():
             (str_in_mac(gen_rand_sting(hex, 12)),
              gen_rand_sting(string.digits, 12),
              gen_rand_sting(self.SYM_EMAIL_CORR, 11),  # 11
-             gen_rand_sting(string.digits + string.ascii_letters, 8))  # 8
+             gen_rand_sting(string.digits + string.ascii_letters, 18))  # 8
             for _ in range(count)]
         return test_data
 
@@ -273,3 +273,6 @@ class TestData():
         ]
         return test_data
 
+d = TestData()
+
+d.data_gen_create_user_mutation(2)
