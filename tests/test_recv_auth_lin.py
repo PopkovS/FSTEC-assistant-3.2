@@ -21,8 +21,10 @@ def setup_for_function():
 
 @pytest.fixture(scope="module", autouse=True)
 def setup():
+    # sock.bind(('', 61796))
     sock.bind(('', 65000))
     sock.listen(1)
+    print('stop_app()')
     stop_app()
 
 
@@ -35,6 +37,7 @@ class TestRecvAuthGen():
     @pytest.mark.parametrize('access, refresh, expires, email, id', data.data_gen_recv_auth_format(1000))
     def test_recv_auth_format(self, access, refresh, expires, email, id):
         create_package_to_recv_auth(access, refresh, expires, email, id)
+        print('conn, addr = sock.accept()')
         conn, addr = sock.accept()
         loggen.info(f"Успешное подключение клиента: '{addr}'")
         loggen.debug(f"Подключение с параметрами: {conn}")
@@ -56,6 +59,7 @@ class TestRecvAuthMut():
         conn, addr = sock.accept()
         logmut.info(f"Успешное подключение клиента: '{addr}'")
         logmut.debug(f"Подключение с параметрами: {conn}")
+        print("\nСейчас будет отправка")
         send_func(conn, file_func="func1_2")
         logs_param_recv_auth(access, refresh, expires, email, id)
         logmut.info("Ответ клиенту успешно отправлен")

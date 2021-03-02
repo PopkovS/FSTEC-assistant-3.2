@@ -7,8 +7,11 @@ import psycopg2
 # assistant-test-v3.2F_corp_core
 # def db_connect(dbname='assistant_test_corp_linux', user='postgres',
 #                password='1q2w3e', host='192.168.70.220'):
-def db_connect(dbname='assistant_test_v3.4F_corp_core', user='postgres',
-               password='1q2w3e', host='192.168.70.220'): #dbname='assistant_test_v3.2F_corp_core' - для 32
+# def db_connect(dbname='assistant_test_v3.4F_corp_core', user='postgres',
+#                password='1q2w3e', host='192.168.70.220'): #dbname='assistant_test_v3.2F_corp_core' - для 32
+def db_connect(dbname='assistant', user='postgres',
+           password='postgres', host='192.168.70.36'):
+
     conn = psycopg2.connect(dbname=dbname, user=user,
                             password=password, host=host)
     cursor = conn.cursor()

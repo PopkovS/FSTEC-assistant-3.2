@@ -47,8 +47,8 @@ class CreteUserPage():
 
 
 class Links():
-    MAIN_LINK = "http://lk.3-4.ast.safib.ru/"
-    MAIN_LINK_LIN = "http://lk.3.4-linux.ast.safib.ru/"
+    MAIN_LINK = "http://lk.win.ru"
+    MAIN_LINK_LIN = "http://lk.3.4-linux.ast.safib.ru"
     LOGIN_LINK = MAIN_LINK + "/Account/Login"
     LOGIN_LINK_LIN = MAIN_LINK_LIN + "/Account/Login"
     CREATE_USER_LINK = MAIN_LINK + "/User/Create"
@@ -127,9 +127,9 @@ class TestData():
 
     def data_gen_hash_format(self, count):
         test_data = [
-            (chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10))),  # 1
-             chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)),  # 13
-             chr(0).join(gen_rand_sting(self.SYM_HEX, 64)))  # 64
+            (bytes(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 1)).encode('utf8')),  # 1
+             bytes(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)).encode('utf8')),  # 13
+             bytes(chr(0).join(gen_rand_sting(self.SYM_HEX, 64)).encode('utf8')))  # 64
             for _ in range(count)]
         return test_data
 
@@ -147,9 +147,11 @@ class TestData():
     def data_gen_hash_mutation(self, count):
         sym_mut = self.SYM_MUT
         test_data = [
-            (zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10))), sym_mut, random.randint(1, 100)),  # 1
-             zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)), sym_mut, random.randint(1, 100)),  # 13
-             zzuf(chr(0).join(gen_rand_sting(self.SYM_HEX, 64)), sym_mut, random.randint(1, 100)))  # 64
+            (
+             bytes(zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, (1, 10))), sym_mut, random.randint(1, 100)).encode('utf8')),  # 1
+             bytes(zzuf(chr(0).join(gen_rand_sting(self.SYM_FOR_FILES, 13)), sym_mut, random.randint(1, 100)).encode('utf8')),  # 13
+             bytes(zzuf(chr(0).join(gen_rand_sting(self.SYM_HEX, 64)), sym_mut, random.randint(1, 100)).encode('utf8'))
+            )  # 64
             for _ in range(count)]
         return test_data
 
@@ -181,8 +183,10 @@ class TestData():
 
     def data_gen_auth_format(self, count):
         test_data = [
-            (chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 15))),
-             chr(0).join(gen_rand_sting(self.SYM_ENG_RUS, 8)))
+            (
+             chr(0).join(str_in_email(gen_rand_sting(self.SYM_EMAIL_CORR, 13))),
+             chr(0).join(gen_rand_sting(self.SYM_ENG_RUS, 2))
+             )
             for _ in range(count)]
         return test_data
 
@@ -204,8 +208,8 @@ class TestData():
 
     def data_gen_auth_mut(self, count):
         test_data = [
-            (" ".join(zzuf("security@ast.ru", self.SYM_MUT, random.randint(1, 100))),
-             " ".join(zzuf("security", self.SYM_MUT, random.randint(1, 100))))
+            (" ".join(zzuf("test@safib.ru", self.SYM_MUT, random.randint(1, 100))),
+             " ".join(zzuf("1", self.SYM_MUT, random.randint(1, 100))))
             for _ in range(count)]
         return test_data
 

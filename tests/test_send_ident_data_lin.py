@@ -10,25 +10,28 @@ data = TestData()
 now = datetime.datetime.now()
 # f = data.data_gen_ident_format(10)
 
+ip_adr = '192.168.70.36'
+port = 44334
+
 
 @pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_format(1000))
 def test_send_ident_format(mac, hs, hv, hn):
     create_package_to_send_ident(mac, hs, hv, hn, original_file="ident_lin", new_file="ident_lin2")
-    sock_connect(ip="192.168.71.50", port=44334, pack_name="ident_lin2")
+    sock_connect(ip=ip_adr, port=port, pack_name="ident_lin2")
     sleep(0.5)
 
 
-@pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_mutation(14000)) #14000
+@pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_mutation(14500))  # 1450
 def test_send_ident_mutation(mac, hs, hv, hn):
     create_package_to_send_ident(mac, hs, hv, hn, original_file="ident_lin", new_file="ident_lin2")
-    sock_connect(ip="192.168.71.50", port=44334, pack_name="ident_lin2")
+    sock_connect(ip=ip_adr, port=port, pack_name="ident_lin2")
     sleep(0.5)
 
 
 @pytest.mark.parametrize('mac, hs, hv, hn', data.data_gen_ident_not_format())
 def test_send_ident_not_format(mac, hs, hv, hn):
     create_package_to_send_ident(mac, hs, hv, hn, original_file="ident_lin", new_file="ident_lin2")
-    sock_connect(ip="192.168.71.50", port=44334, pack_name="ident_lin2")
+    sock_connect(ip=ip_adr, port=port, pack_name="ident_lin2")
 
 
 @pytest.mark.parametrize('par', ["mac", "hs", "hv", "hn"])

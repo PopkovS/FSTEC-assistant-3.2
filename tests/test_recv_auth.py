@@ -9,6 +9,10 @@ from modules.send_pack_helper import *
 data = TestData()
 
 sock = socket.socket()
+"""Для этого теста нужно второе корыто у которого ID сервер это ip-адрес устройства 
+где запускается тест(192.168.70.101), а порт из "sock.bind(('', 65000))". Перед тестом ведомый должен
+запустить у себя скрипт (./run_ass.py) который каждый раз запускает приложение если оно не запущенно
+(закрывает приложнеие скрипт с основным тестом)"""
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -21,8 +25,11 @@ def setup_for_function():
 
 @pytest.fixture(scope="module", autouse=True)
 def setup():
+    print('\n 1111111111111111111')
     sock.bind(('', 65000))
+    print('\n 122222111')
     sock.listen(1)
+    print('\n 112333333331')
     stop_app()
 
 
@@ -35,9 +42,11 @@ class TestRecvAuthGen():
     @pytest.mark.parametrize('access, refresh, expires, email, id', data.data_gen_recv_auth_format(1000))
     def test_recv_auth_format(self, access, refresh, expires, email, id):
         create_package_to_recv_auth(access, refresh, expires, email, id)
+        print('\n 22222222222222222222222')
         conn, addr = sock.accept()
         loggen.info(f"Успешное подключение клиента: '{addr}'")
         loggen.debug(f"Подключение с параметрами: {conn}")
+        print('\n 33333333333333333333')
         send_func(conn, file_func="func1_2")
         logs_param_recv_auth(access, refresh, expires, email, id)
         loggen.info("Ответ клиенту успешно отправлен")
@@ -50,7 +59,7 @@ class TestRecvAuthMut():
         global logmut
         logmut = log_for_tests(f_name="format_mut_recv_auth")
 
-    @pytest.mark.parametrize('access, refresh, expires, email, id', data.data_gen_recv_auth_mut(1270))
+    @pytest.mark.parametrize('access, refresh, expires, email, id', data.data_gen_recv_auth_mut(1500))
     def test_recv_auth_mut(self, access, refresh, expires, email, id):
         create_package_to_recv_auth(access, refresh, expires, email, id)
         conn, addr = sock.accept()

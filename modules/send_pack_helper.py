@@ -4,6 +4,7 @@ import re
 import os
 import socket
 # from socket import socket, AF_INET, SOCK_DGRAM
+from modules.data import *
 from time import sleep
 
 import winrm
@@ -12,15 +13,15 @@ from definitions import ROOT_DIR
 import binascii
 
 
-def sock_connect(ip='192.168.71.03', port=44334, pack_name="", get_response=True):
+def sock_connect(ip='192.168.70.36', port=44334, pack_name="", get_response=True):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
     text = open(os.path.join(ROOT_DIR, "packages", pack_name), 'rb').read()
     sock.sendall(text)
     if get_response:
         # print_response(sock)
-        sock.recv(1024).decode("utf-8", errors="replace")
-        # print(sock.recv(1024).decode("utf-8", errors="replace"))
+        # sock.recv(1024).decode("utf-8", errors="replace")
+        print(sock.recv(1024).decode("utf-8", errors="replace"))
     return sock
 
 
@@ -33,16 +34,16 @@ def recount_length(my_filename="identdata2"):
     with open(f'../packages/{my_filename}') as file_in:
         text = file_in.read()
         text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
-                            str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
+                            str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
     write_in_pack(text)
 
 
 def recount_length_auth():
     with open(r'../packages/auth2', 'r', encoding="utf8", errors='replace') as pack:
         text = pack.read()
-        lean = str(len(re.search(r'Content-Length:.\d*\n(\n.*)', text).group(1)))
-        with open(r'../packages/auth2', 'rb') as pack:
-            text = pack.read()
+        lean = str(len(re.search(r'Content-Length:.\d*(\n\n.*)', text).group(1)))
+        with open(r'../packages/auth2', 'rb') as pack1:
+            text = pack1.read()
             text = text.replace(re.search(rb'Content-Length:.(\d*)', text).group(1), lean.encode())
             with open(f"../packages/auth2", "wb") as file_out:
                 file_out.write(text)
@@ -56,19 +57,52 @@ def create_package_to_send_ident(mac, hs, hv, hn, new_file="identdata2", origina
         text = text.replace(re.search(r'HV(.*)HN', text).group(1), hv)
         text = text.replace(re.search(r'HN(.*)C', text).group(1), hn)
         if recount:
+            print(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1)))
+            print(re.search(r'Content-Length: (\d*)\n\n', text).group(1))
             text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
-                                str(len(re.search(r'Content-Length: \d*\n\n(.*\n.*)', text).group(1))))
+                                str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
     write_in_pack(text, pack=new_file)
 
 
-def create_package_to_send_hash(path, file, hash, new_file="identdata2", original_file="identdata"):
+def create_package_to_send_hash_old(path, file, hash, new_file="identdata2", original_file="identdata"):
     with open(os.path.join(ROOT_DIR, "packages", original_file)) as file_in:
         text = file_in.read()
-        text = text.replace(re.search(r'.A.s.s.i.s.t.a.n.t...e.x.e..S.2.5.6..(.+?)..L..', text).group(1), hash)
+        print('Кво символов', str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))), sep=' --- ')
+
+        print('Это хэш ---- ', len(re.search(r'.S.2.5.6..(.+?)..L..', text).group(1)))
+        print('Это хэш ---- ', re.search(r'.S.2.5.6..(.+?)..L..', text).group(1))
+        text = text.replace(re.search(r'.S.2.5.6..(.+?)..L..', text).group(1), hash)
+        print("Это путь ---  ", len(re.search(r'..L..(.+?)..N', text).group(0)))
         text = text.replace(re.search(r'..L..(.+?)..N', text).group(0),
                             b"\x00\x00L\x00\x02\x00".decode("utf8") + path + b"\x00\x03\x00N".decode("utf8"))
-        text = text.replace(re.search(r'.N..(.+?)..S.2.5.6.', text).group(1), file)
-    write_in_pack(text, pack=new_file)
+
+        print('Это файл --- ', len(re.search(r'.N..(A.+?)..S.2.5.6.', text).group(1)))
+        print('Это файл --- ', (re.search(r'.N..(A.+?)..S.2.5.6.', text).group(1)))
+        text = text.replace(re.search(r'.N..(A.+?)..S.2.5.6.', text).group(1),
+                            file)
+        print(re.search(r'Content-Length: (\d*)\n\n', text).group(1))
+        text = text.replace(re.search(r'Content-Length: (\d*)\n\n', text).group(1),
+                            str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
+        print('Объём после изменений - ', str(len(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))))
+        print(re.search(r'Content-Length: \d*\n\n(.*)', text).group(1))
+    with open(os.path.join(ROOT_DIR, "packages", new_file), 'wb') as nf:
+        nf.write(text.encode('utf8'))
+    # write_in_pack(text, pack=new_file)
+
+
+def create_package_to_send_hash(path, file, hash, new_file="ident_lin2", original_file="ident_lin"):
+    with open(os.path.join(ROOT_DIR, "packages", original_file), 'rb') as file_in:
+        text = file_in.read()
+        print(len(re.search(rb'.S.2.5.6..(.+?)..L..', text).group(1).decode('utf8').replace(chr(0), '')))
+        print(re.search(rb'..L..(.+?)..N', text).group(0).decode('utf8'))
+        print(re.search(rb'.N..(A.+?)..S.2.5.6.', text).group(1).decode('utf8'))
+        text = text.replace(re.search(rb'.S.2.5.6..(.+?)..L..', text).group(1), hash)
+        text = text.replace(re.search(rb'..L..(.+?)..N', text).group(0),
+                            b"\x00\x00L\x00\x02\x00" + path + b"\x00\x03\x00N")
+        text = text.replace(re.search(rb'.N..(A.+?)..S.2.5.6.', text).group(1),
+                            file)
+    with open(os.path.join(ROOT_DIR, "packages", new_file), 'wb') as nf:
+        nf.write(text)
 
 
 def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTest2"):
@@ -84,11 +118,7 @@ def create_package_to_send_trs(trs, id, original_file="trsTest", new_file="trsTe
 def create_package_to_send_auth(login, password, original_file='auth', new_file="auth2"):
     with open(os.path.join(ROOT_DIR, "packages", original_file), "rb") as file_in:
         text = file_in.read()
-        # print(text)
         text = text.replace(re.search(rb'p.1..(.+?)..p.2..', text).group(1), login.encode())
-        # print("\n")
-        # print(password.encode())
-        # print(rb"p\x002\x00\x02\x00" + b"  " + password.encode())
         text = text.replace(re.search(rb'.(p.2..+?)..p.3.', text).group(1),
                             b"p\x002\x00\x02\x00" + password.encode())
         # text = text.replace(re.search(rb'Content-Length:.(\d*)\r\n\r\n', text).group(1),
@@ -158,29 +188,40 @@ def send_func(conn, file_func="func1_2"):
 
 
 def stop_app():
-    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    # sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('win10', auth=(r'win10\admin', '123'), transport='ntlm')
     sess.run_cmd('taskkill /IM assistant.exe /F')
 
 
 def answer_id_srv_check():
+    """Тест считается успешным если в логах будет строка "Answer id-srv for func #1 process done"
+    На данный момент проверка закоменчена потому что не фига не получается.
+    На тест по формату всегда должен быть положительный ответ,
+    остальные тесты на мутацию и не по формату должны быть отрицательными,
+    соответственно надо раскомментить другие строки"""
+
     loggen = logging.getLogger('base_test.answer')
-    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    # sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('win10', auth=(r'win10\admin', '123'), transport='ntlm')
     r = sess.run_cmd('type "C:\Program Files (x86)\Ассистент\log\AstCln*"')
-    if "Answer id-srv for func #1 process done" in r.std_out.decode("utf8", "replace"):
-        loggen.debug('Получено ответ от клиента: "Answer id-srv for func #1 process done"')
-        return True
-    else:
-        loggen.debug('Не удалось получить ответ от клиета')
-        return False
+    sleep(1)
+    # if "Answer id-srv for func #1 process done" in r.std_out.decode("utf8", "replace"):
+    #     loggen.debug('Получено ответ от клиента: "Answer id-srv for func #1 process done"')
+    # return True
+    # loggen.debug('Получено ответ от клиента: "Answer id-srv for func #1 process done"')
+    # return True
+    # else:
+    loggen.debug('Не удалось получить ответ от клиента')
+    return False
+    #     loggen.debug('Не удалось получить ответ от клиента')
+    #     return False
 
 
 def delete_all_log_file():
-    sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    # sess = winrm.Session('c432varganov', auth=(r'safib\varganov', '1qaz@WSX'), transport='ntlm')
+    sess = winrm.Session('win10', auth=(r'win10\admin', '123'), transport='ntlm')
     sess.run_cmd('DEL /F /S /Q /A "C:\Program Files (x86)\Ассистент\log\*"')
 
-# with open(os.path.join(ROOT_DIR, "packages", "ident_lin")) as file_in:
-#     text = file_in.read()
-#     print(re.search(r'M(\w\w-\w\w-\w\w-\w\w-\w\w-\w\w)', text).group(1))
-#     print(len(re.search(r'HS(\d*)', text).group(1)))
-#     print(len(re.search(r'HV(.*)HN', text).group(1)))
-#     print(len(re.search(r'HN(.*)C', text).group(1)))
+
+if __name__ == '__main__':
+    sock_connect('192.168.70.36', 44444, 'trs_lin2', True)

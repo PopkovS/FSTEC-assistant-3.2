@@ -47,7 +47,7 @@ class SeleniumHelper():
             return False
         return True
 
-    def login(self, email, password, name_user="Администратор системы"):
+    def login(self, email, password, name_user="Администратор безопасности"):
         email_field = self.browser.find_element(*Locators.EMAIL_FIELD)
         email_field.send_keys(email)
         password_field = self.browser.find_element(*Locators.PASSWORD_USER_FIELD)
